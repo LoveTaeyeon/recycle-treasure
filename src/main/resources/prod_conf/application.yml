@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: recycle-treature-api
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-init-sql: set names utf8mb4
+    url: jdbc:mysql://${MAIN_DB_URL}/${MAIN_DB_NAME}?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    password: ${MAIN_DB_PASSWORD}
+    username: ${MAIN_DB_USERNAME}
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 10
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
