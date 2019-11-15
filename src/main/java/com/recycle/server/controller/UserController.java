@@ -1,24 +1,58 @@
 package com.recycle.server.controller;
 
+import com.recycle.server.entity.User;
+import com.recycle.server.entity.exception.InvalidSession;
 import com.recycle.server.entity.request.LoginRequest;
+import com.recycle.server.service.UserService;
+import com.recycle.server.util.ResUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Slf4j
 public class UserController {
 
-    @PostMapping
+    private HttpServletRequest request;
+    private UserService userService;
+
+    @Autowired
+    public UserController(HttpServletRequest request,
+                          UserService userService) {
+        this.request = request;
+        this.userService = userService;
+    }
+
+    @PostMapping("/user/login")
     public ResponseEntity login(@RequestBody LoginRequest request) {
         try {
-            return null;
+            User user = User.builder()
+                    .wenXinOpenId(request.getWeiXinOpenId())
+                    .token(request.getWeiXinSessionToken())
+                    .build();
+            user = userService.weiXinLogin(user);
+            return ResUtils.ok(user);
+        } catch (InvalidSession invalidSession) {
+            return ResUtils.invalidReq(invalidSession.getMessage());
         } catch (Exception e) {
             log.error("[Login Failed] request: " + request, e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResUtils.unknownException(e);
+        }
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity getUser(@PathVariable("id") Integer userId) {
+        try {
+            User user = userService.updateUser(User.build(userId, request));
+            return ResUtils.ok(user);
+        } catch (InvalidSession invalidSession) {
+            return ResUtils.invalidReq(invalidSession.getMessage());
+        } catch (Exception e) {
+            log.error("[Query User Failed] userId: " + userId, e);
+            return ResUtils.unknownException(e);
         }
     }
 

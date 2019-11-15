@@ -18,4 +18,8 @@ public class Token {
     private String token;
     private Timestamp createdTime;
 
+    public static Token build(Integer userId, String token) {
+        return Token.builder().userId(userId).token(token).build();
+    }
+
 }

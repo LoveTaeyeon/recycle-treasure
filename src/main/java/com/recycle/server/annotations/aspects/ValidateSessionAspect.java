@@ -38,7 +38,7 @@ public class ValidateSessionAspect {
             User user = (User) args[0];
             Token token = tokenService.queryToken(user.getId());
             if (!token.getToken().equals(user.getToken())) {
-                throw new InvalidSession(ResponseStrings.INVALID_SESSION);
+                throw new InvalidSession();
             }
         } catch (InvalidSession invalidSession) {
             MainMetrics.INVALID_SESSION.increment();

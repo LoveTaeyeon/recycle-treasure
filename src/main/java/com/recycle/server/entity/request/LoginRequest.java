@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginRequest {
 
-    private Integer weiXinOpenId;
+    private String weiXinOpenId;
     private String weiXinSessionToken;
 
 }
