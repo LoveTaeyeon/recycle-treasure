@@ -4,6 +4,9 @@ import com.recycle.server.entity.User;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.List;
+
 @Mapper
 @Component
 public interface UserMapper {
@@ -38,6 +41,18 @@ public interface UserMapper {
             " where id = #{id}"
     })
     User selectById(@Param("id") Integer id);
+
+    @Select({
+            "<script>",
+            "select " + QUERY_FIELDS,
+            " from " + USER_TABLE_NAME,
+            " where id in ",
+            " <foreach collection=\"ids\" index = \"index\" item = \"id\" open= \"(\" separator=\",\" close=\")\">",
+            "    #{id}",
+            " </foreach>",
+            "</script>"
+    })
+    List<User> selectByIds(@Param("ids") Collection<Integer> ids);
 
     @Select({
             "select " + QUERY_FIELDS,

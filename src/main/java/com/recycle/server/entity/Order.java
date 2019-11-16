@@ -25,4 +25,6 @@ public class Order {
     private Timestamp modifiedTime;
     private Timestamp updatedTime;
 
+    private User userInfo;
+
 }

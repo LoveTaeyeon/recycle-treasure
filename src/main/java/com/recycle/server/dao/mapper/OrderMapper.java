@@ -70,6 +70,15 @@ public interface OrderMapper {
             " from " + ORDER_TABLE_NAME,
             " where id = #{id}"
     })
-    Order selectOrder(@Param("id") Integer id);
+    Order selectOrder(@Param("id") Long id);
+
+    @Select({
+            "select " + QUERY_FIELDS,
+            " from " + ORDER_TABLE_NAME,
+            " <if test='createdTime != null'> where created_time < #{createdTime} </if>",
+            " order by created_time desc",
+            " limit #{limit}"
+    })
+    List<Order> recentOrders(@Param("createdTime") Long createdTime);
 
 }

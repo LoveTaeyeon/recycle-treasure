@@ -17,8 +17,15 @@ public class PageTokenUtils {
         return token;
     }
 
-    public static String build(PageToken token) {
+    private static String buildTokenString(PageToken token) {
         return new String(Base64.getEncoder().encode(JSON.toJSONString(token).getBytes()));
+    }
+
+    public static PageToken build(PageToken token) {
+        String nextPageToken = buildTokenString(token);
+        token.setNextId(token.getPreId());
+        String prePageToken = buildTokenString(token);
+        return PageToken.builder().nextPageToken(nextPageToken).prePageToken(prePageToken).build();
     }
 
 }

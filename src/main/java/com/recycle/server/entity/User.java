@@ -38,4 +38,10 @@ public class User {
         return User.builder().id(userId).token(sessionToken).build();
     }
 
+    public static User build(HttpServletRequest request) {
+        String sessionToken = request.getHeader(Constants.HEADER_SESSION_KEY);
+        Integer userId = Integer.valueOf(request.getHeader(Constants.HEADER_USER_ID_KEY));
+        return User.builder().id(userId).token(sessionToken).build();
+    }
+
 }
