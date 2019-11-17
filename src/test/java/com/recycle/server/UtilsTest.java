@@ -17,17 +17,17 @@ public class UtilsTest {
                 .preId(900L)
                 .type(PagingType.OFFSET.getCode())
                 .build();
-        String tokenStr = PageTokenUtils.build(token);
-        token = PageTokenUtils.parse(tokenStr, PagingType.OFFSET);
+        PageToken parsedToken = PageTokenUtils.build(token);
+        token = PageTokenUtils.parse(parsedToken.getNextPageToken(), PagingType.OFFSET);
         Assert.assertEquals(token.getNextId().longValue(), 1000L);
         Assert.assertEquals(token.getPreId().longValue(), 900L);
 
         token.setType(null);
-        tokenStr = PageTokenUtils.build(token);
+        parsedToken = PageTokenUtils.build(token);
 
         int errorCount = 0;
         try {
-            PageTokenUtils.parse(tokenStr, PagingType.OFFSET);
+            PageTokenUtils.parse(parsedToken.getNextPageToken(), PagingType.OFFSET);
         } catch (Exception e) {
             errorCount++;
         }

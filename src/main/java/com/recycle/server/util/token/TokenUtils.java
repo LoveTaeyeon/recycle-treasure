@@ -12,7 +12,7 @@ public class TokenUtils {
     }
 
     public static String build(User user) throws Exception {
-        return AESUtils.encrypt(buildString(user.getId(), user.getLatestAccessToken()));
+        return AESUtils.encrypt(buildString(user.getId(), user.getToken()));
     }
 
     public static String build(Integer id, String token) throws Exception {
@@ -23,7 +23,7 @@ public class TokenUtils {
         String value = AESUtils.decrypt(token);
         String valueArr[] = value.split(COMMA);
         return user.getId().equals(Integer.valueOf(valueArr[0]))
-                && user.getLatestAccessToken().equals(valueArr[1]);
+                && user.getToken().equals(valueArr[1]);
     }
 
     public static boolean validate(Integer id, String latestToken, String token) throws Exception {
