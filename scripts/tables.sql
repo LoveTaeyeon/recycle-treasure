@@ -8,7 +8,7 @@ CREATE TABLE `user` (
   `created_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_wx` (`wei_xin_id`) USING HASH
+  UNIQUE KEY `idx_wx` (`wei_xin_open_id`) USING HASH
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `order` (
