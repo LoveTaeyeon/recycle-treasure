@@ -44,7 +44,7 @@ public class OrderController {
     }
 
     @GetMapping("/order/myself")
-    public ResponseEntity batchGetOrder(@RequestParam("pageToken") String pageToken) {
+    public ResponseEntity batchGetOrder(@RequestParam(value = "pageToken", required = false) String pageToken) {
         try {
             User user = User.build(request);
             PageToken token = PageTokenUtils.parse(pageToken, PagingType.OFFSET);
@@ -59,7 +59,7 @@ public class OrderController {
     }
 
     @GetMapping("/order/recent")
-    public ResponseEntity recentOrders(@RequestParam("pageToken") String pageToken) {
+    public ResponseEntity recentOrders(@RequestParam(value = "pageToken", required = false) String pageToken) {
         try {
             User user = User.build(request);
             PageToken token = PageTokenUtils.parse(pageToken, PagingType.OFFSET);

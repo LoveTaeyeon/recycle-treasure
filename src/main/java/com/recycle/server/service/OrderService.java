@@ -5,8 +5,6 @@ import com.recycle.server.entity.User;
 import com.recycle.server.entity.model.PageToken;
 import com.recycle.server.entity.response.TokenResponse;
 
-import java.util.List;
-
 public interface OrderService {
 
     Order createOrder(User user, Order order) throws Exception;

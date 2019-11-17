@@ -39,14 +39,7 @@
         </filter>
     </appender>
 
-    <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>ERROR</level>
-        </filter>
-    </appender>
-
     <root level="INFO">
-        <appender-ref ref="SENTRY"/>
         <appender-ref ref="ERROR" />
         <appender-ref ref="INFO" />
         <appender-ref ref="STDOUT" />

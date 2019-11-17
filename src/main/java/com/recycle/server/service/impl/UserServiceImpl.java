@@ -28,10 +28,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User weiXinLogin(User user) throws Exception {
         // validate is valid data
-        if (Strings.isNullOrEmpty(user.getWenXinOpenId()) || Strings.isNullOrEmpty(user.getToken())) {
+        if (Strings.isNullOrEmpty(user.getWeiXinOpenId()) || Strings.isNullOrEmpty(user.getToken())) {
             throw new InvalidSession();
         }
-        User existedUser = userMapper.selectByWXOpenId(user.getWenXinOpenId());
+        User existedUser = userMapper.selectByWXOpenId(user.getWeiXinOpenId());
         // sync token
         if (existedUser != null) {
             tokenMapper.createToken(Token.build(existedUser.getId(), user.getToken()));
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
             return existedUser;
         } else {
             // it's new user
-            User newUser = User.build(user.getWenXinOpenId());
+            User newUser = User.build(user.getWeiXinOpenId());
             userMapper.createUser(newUser);
             tokenMapper.createToken(Token.build(newUser.getId(), user.getToken()));
             newUser.setToken(user.getToken());
@@ -49,11 +49,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @ValidateSession
-    public User getUser(User user) throws Exception {
-        user = userMapper.selectById(user.getId());
-        Token token = tokenMapper.selectUserLatestToken(user.getId());
-        user.setToken(token.getToken());
-        return user;
+    public User getUser(User user, Integer userId) throws Exception {
+        User queryUser = userMapper.selectById(userId);
+        if (userId.equals(user.getId())) {
+            Token token = tokenMapper.selectUserLatestToken(userId);
+            queryUser.setToken(token.getToken());
+        } else {
+            queryUser.setAddress(null);
+            queryUser.setPhone(null);
+            queryUser.setRole(null);
+            queryUser.setWeiXinOpenId(null);
+            queryUser.setToken(null);
+        }
+        return queryUser;
     }
 
     @Override

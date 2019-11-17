@@ -9,6 +9,9 @@ import java.util.Base64;
 public class PageTokenUtils {
 
     public static PageToken parse(String pageToken, PagingType type) throws Exception {
+        if (pageToken == null) {
+            return PageToken.empty();
+        }
         String str = new String(Base64.getDecoder().decode(pageToken));
         PageToken token = JSON.parseObject(str, PageToken.class);
         if (token.getType() == null || !token.getType().equals(type.getCode())) {
@@ -22,6 +25,9 @@ public class PageTokenUtils {
     }
 
     public static PageToken build(PageToken token) {
+        if (token == null) {
+            return null;
+        }
         String nextPageToken = buildTokenString(token);
         token.setNextId(token.getPreId());
         String prePageToken = buildTokenString(token);

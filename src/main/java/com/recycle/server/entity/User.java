@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 public class User {
 
     private Integer id;
-    private String wenXinOpenId;
+    private String weiXinOpenId;
     private Integer role;
     private String phone;
     private String address;
@@ -28,7 +28,7 @@ public class User {
 
     public static User build(String wenXinOpenId) {
         return User.builder()
-                .wenXinOpenId(wenXinOpenId)
+                .weiXinOpenId(wenXinOpenId)
                 .createdTime(DateExtUtils.currentTimestamp())
                 .build();
     }

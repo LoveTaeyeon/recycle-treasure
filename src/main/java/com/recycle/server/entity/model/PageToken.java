@@ -17,4 +17,8 @@ public class PageToken {
     private String nextPageToken;
     private String prePageToken;
 
+    public static PageToken empty() {
+        return PageToken.builder().build();
+    }
+
 }

@@ -11,12 +11,12 @@ import java.util.List;
 @Component
 public interface UserMapper {
 
-    String USER_TABLE_NAME = "user";
-    String QUERY_FIELDS = "id, wenXinOpenId, role, phone, address, createdTime";
+    String USER_TABLE_NAME = "`user`";
+    String QUERY_FIELDS = "id, wei_xin_open_id, role, phone, address, created_time";
 
     @Insert({
             "insert into " + USER_TABLE_NAME,
-            " (wen_xin_open_id, created_time)",
+            " (wei_xin_open_id, created_time)",
             " values (#{wenXinOpenId}, #{createdTime})"
     })
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id", useCache = false)
@@ -28,7 +28,7 @@ public interface UserMapper {
             "<set>",
             "   <if test='role != null'> role = #{role}, </if>",
             "   <if test='phone != null'> phone = #{phone}, </if>",
-            "   <if test='address != null'> role = #{address}, </if>",
+            "   <if test='address != null'> address = #{address}, </if>",
             "</set>",
             "where id = #{id}",
             "</script>"

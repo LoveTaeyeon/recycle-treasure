@@ -29,7 +29,7 @@ CREATE TABLE `order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `token` (
-  `id` bigint(16) NOT NULL,
+  `id` bigint(16) NOT NULL AUTO_INCREMENT,
   `user_id` int(10) NOT NULL,
   `token` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
   `created_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

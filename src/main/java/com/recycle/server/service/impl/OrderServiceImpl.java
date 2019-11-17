@@ -2,8 +2,10 @@ package com.recycle.server.service.impl;
 
 import com.recycle.server.annotations.ValidateSession;
 import com.recycle.server.constants.Constants;
+import com.recycle.server.constants.PagingType;
 import com.recycle.server.constants.ResponseStrings;
 import com.recycle.server.constants.enums.OrderStatus;
+import com.recycle.server.constants.enums.UserRole;
 import com.recycle.server.dao.mapper.OrderMapper;
 import com.recycle.server.dao.mapper.UserMapper;
 import com.recycle.server.entity.Order;
@@ -34,6 +36,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void validateOrder(Order order) throws Exception {
+        if (order.getStatus() != null) {
+            return;
+        }
         if (order.getBottleCount() != null && order.getBottleCount() > 0) {
             return;
         }
@@ -55,6 +60,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @ValidateSession
     public Order createOrder(User user, Order order) throws Exception {
+        if (!user.getId().equals(order.getUserId())) {
+            throw new Exception(ResponseStrings.EMPTY_MESSAGE);
+        }
         validateOrder(order);
         order.setStatus(OrderStatus.WAITING.getCode());
         order.setCreatedTime(DateExtUtils.currentTimeMill());
@@ -65,16 +73,43 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @ValidateSession
     public void deleteOrder(User user, Long orderId) throws Exception {
+        Order oldOrder = orderMapper.selectOrder(orderId);
+        if (!oldOrder.getUserId().equals(user.getId())) {
+            throw new Exception(ResponseStrings.EMPTY_MESSAGE);
+        }
         orderMapper.updateOrder(
-                Order.builder().id(orderId).status(OrderStatus.DELETE.getCode()).build()
+                Order.builder()
+                        .id(orderId)
+                        .status(OrderStatus.DELETE.getCode())
+                        .modifiedTime(DateExtUtils.currentTimestamp())
+                        .build(),
+                false
         );
     }
 
     @Override
     @ValidateSession
     public Order updateOrder(User user, Order order) throws Exception {
+        // validate input
+        if (!order.getUserId().equals(user.getId())) {
+            throw new Exception(ResponseStrings.EMPTY_MESSAGE);
+        }
         validateOrder(order);
-        orderMapper.updateOrder(order);
+        user = userMapper.selectById(user.getId());
+        Order oldOrder = orderMapper.selectOrder(order.getId());
+        if (!oldOrder.getUserId().equals(user.getId())) {
+            throw new Exception(ResponseStrings.EMPTY_MESSAGE);
+        }
+        if (!UserRole.ADMIN.getCode().equals(user.getRole())
+                && OrderStatus.PROCESSING.getCode().equals(order.getStatus())) {
+            throw new Exception(ResponseStrings.ERROR_PROCESSING);
+        }
+        // set default value
+        if (order.getStatus() == null) {
+            order.setStatus(oldOrder.getStatus());
+        }
+        order.setModifiedTime(DateExtUtils.currentTimestamp());
+        orderMapper.updateOrder(order, true);
         return order;
     }
 
@@ -89,6 +124,9 @@ public class OrderServiceImpl implements OrderService {
 
     private void fillOrderUserInfo(List<Order> orders) {
         Set<Integer> userIds = orders.stream().map(Order::getUserId).collect(Collectors.toSet());
+        if (userIds == null || userIds.size() == 0) {
+            return;
+        }
         List<User> userList = userMapper.selectByIds(userIds);
         Map<Integer, User> userMap = userList.stream().collect(Collectors.toMap(User::getId, item -> item));
         for (Order order : orders) {
@@ -107,13 +145,14 @@ public class OrderServiceImpl implements OrderService {
         fillOrderUserInfo(orders);
         Long lastId = null;
         for (Order order : orders) {
-            lastId = order.getId();
+            lastId = order.getCreatedTime();
         }
         return TokenResponse.build(
                 orders,
                 PageToken.builder()
                         .nextId(lastId)
                         .preId(pageToken != null ? pageToken.getNextId() : null)
+                        .type(PagingType.OFFSET.getCode())
                         .build()
         );
     }
@@ -121,7 +160,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @ValidateSession
     public TokenResponse recentOrders(User user, PageToken pageToken) throws Exception {
-        List<Order> orders = orderMapper.recentOrders(pageToken != null ? pageToken.getNextId() : null);
+        List<Order> orders = orderMapper.recentOrders(
+                pageToken != null ? pageToken.getNextId() : null,
+                Constants.DEFAULT_PAGE_SIZE
+        );
         fillOrderUserInfo(orders);
         Long minCreatedTime = null;
         for (Order order : orders) {
@@ -132,6 +174,7 @@ public class OrderServiceImpl implements OrderService {
                 PageToken.builder()
                         .nextId(minCreatedTime)
                         .preId(pageToken != null ? pageToken.getNextId() : null)
+                        .type(PagingType.OFFSET.getCode())
                         .build()
         );
     }

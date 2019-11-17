@@ -1,5 +1,6 @@
 package com.recycle.server.entity;
 
+import com.recycle.server.util.DateExtUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class Token {
     private Timestamp createdTime;
 
     public static Token build(Integer userId, String token) {
-        return Token.builder().userId(userId).token(token).build();
+        return Token.builder().userId(userId).token(token).createdTime(DateExtUtils.currentTimestamp()).build();
     }
 
 }
